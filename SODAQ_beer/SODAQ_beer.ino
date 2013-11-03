@@ -12,7 +12,6 @@ OneWire ds(2);  // on pin 2
 
 int sent_sms=0 ;  // we only want to send an sms once
 float beertemp; 
-String buffer;
 bool smsSent;
 int line=1;
 
