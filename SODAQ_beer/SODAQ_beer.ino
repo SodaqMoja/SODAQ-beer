@@ -13,8 +13,6 @@ OneWire ds(2);  // on pin 2
 int sent_sms=0 ;  // we only want to send an sms once
 float beertemp; 
 bool smsSent;
-int line=1;
-
 
 
 void setup()   /*----( SETUP: RUNS ONCE )----*/
@@ -41,7 +39,7 @@ void loop()   /*----( LOOP: RUNS CONSTANTLY )----*/
       SeeedOled.setTextXY(4,0);         
       SeeedOled.putString("Sending SMS");
       SeeedOled.setTextXY(5,0);
-      smsSent = sendSMS("The beer is cold", "+31681517710"); 
+      smsSent = gprsbee.sendSMS("The beer is cold", "+999999998"); //put number here, start by country code 
       delay(2000);
       gprsbee.off();
       if (smsSent){
@@ -109,33 +107,6 @@ float OWtemp(void){
   }
   celsius = (float)raw / 16.0;
   return celsius;
-}
-
-
-static bool sendSMS(char *message, char *number ){
-  char cmdbuf[60];  
-  gprsbee.on();
-  if (!gprsbee.sendCommandWaitForOK("ATE0")) {
-    return false;
-  }
-  if (!gprsbee.sendCommandWaitForOK("AT+CMGF=1")) {
-    return false;
-  }    
-  
-  strcpy(cmdbuf, "AT+CMGS=\"");
-  strcat(cmdbuf, number);
-  strcat(cmdbuf, "\"");  
-  gprsbee.sendCommand(cmdbuf);
-  if (!gprsbee.waitForPrompt(">",500)) {
-    return false;
-  }  
-  gprsbee.sendCommand(message);//the message itself
-  delay(200);
-  Serial.write(26);//the ASCII code of ctrl+z is 26, this is needed to end the send modus and send the message.
-  if (!gprsbee.waitForOK(10000)) {
-      return false;
-  }
-  return true;
 }
  
 /* ( THE END ) */
