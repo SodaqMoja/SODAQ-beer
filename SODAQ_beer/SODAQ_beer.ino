@@ -4,11 +4,15 @@
 #include <GPRSbee.h>
 
 
+// Fill in your mobile number here. Start with + and country code
+#define TELNO           "+999999998"
+
 #define GPRSBEE_PWRPIN 7
-#define XBEECTS_PIN 8
+#define XBEECTS_PIN    8
+#define ONEWIRE_PIN    2
 
 
-OneWire ds(2);  // on pin 2
+OneWire ds(ONEWIRE_PIN);
 
 int sent_sms=0 ;  // we only want to send an sms once
 float beertemp; 
@@ -24,11 +28,10 @@ void setup()   /*----( SETUP: RUNS ONCE )----*/
   gprsbee.init(Serial, XBEECTS_PIN, GPRSBEE_PWRPIN);
   gprsbee.off();
   Wire.begin();
-  SeeedOled.init();  //initialze SEEED OLED display
+  SeeedOled.init();                  //initialize SEEED OLED display
   SeeedOled.clearDisplay();          //clear the screen and set start position to top left corner
   SeeedOled.setNormalDisplay();      //Set display to normal mode (i.e non-inverse mode)
   SeeedOled.setPageMode();           //Set addressing mode to Page Mode
-  
 }/*--(end setup )---*/
  
 void loop()   /*----( LOOP: RUNS CONSTANTLY )----*/
@@ -42,21 +45,17 @@ void loop()   /*----( LOOP: RUNS CONSTANTLY )----*/
       SeeedOled.setTextXY(4,0);         
       SeeedOled.putString("Sending SMS");
       SeeedOled.setTextXY(5,0);
-      smsSent = gprsbee.sendSMS("The beer is cold", "+999999998"); //put number here, start by country code 
+      smsSent = gprsbee.sendSMS(TELNO, "The beer is cold");
       delay(2000);
       gprsbee.off();
       if (smsSent){
-        SeeedOled.setTextXY(6,0);         
+        SeeedOled.setTextXY(6,0);
         SeeedOled.putString("SMS sent OK");
       } else {
-        SeeedOled.setTextXY(6,0);         
+        SeeedOled.setTextXY(6,0);
         SeeedOled.putString("SMS not sent");
-      }  
-      
-  }  
-        
-  
-
+      }
+  }
 }/* --(end main loop )-- */
  
 
