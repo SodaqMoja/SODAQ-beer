@@ -48,13 +48,10 @@ void loop()             /*----( LOOP: RUNS CONSTANTLY )----*/
       SeeedOled.putString("Sending SMS");
       SeeedOled.setTextXY(5,0);
       bool smsSent = gprsbee.sendSMS(TELNO, "The beer is cold");
-      delay(2000);
-      gprsbee.off();
+      SeeedOled.setTextXY(6, 0);
       if (smsSent) {
-        SeeedOled.setTextXY(6,0);
         SeeedOled.putString("SMS sent OK");
       } else {
-        SeeedOled.setTextXY(6,0);
         SeeedOled.putString("SMS not sent");
       }
   }
