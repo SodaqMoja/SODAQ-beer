@@ -14,6 +14,9 @@ int sent_sms=0 ;  // we only want to send an sms once
 float beertemp; 
 bool smsSent;
 
+//############ forward declare #################
+// This is only needed to make avr-eclipse happy
+float OWtemp(void);
 
 void setup()   /*----( SETUP: RUNS ONCE )----*/
 {
