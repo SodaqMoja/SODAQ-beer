@@ -14,9 +14,7 @@
 
 OneWire ds(ONEWIRE_PIN);
 
-int sent_sms=0 ;  // we only want to send an sms once
-float beertemp;
-bool smsSent;
+bool sent_sms;  // we only want to send an sms once
 
 //############ forward declare #################
 // This is only needed to make avr-eclipse happy
@@ -38,14 +36,18 @@ void loop()             /*----( LOOP: RUNS CONSTANTLY )----*/
 {
   SeeedOled.setTextXY(0,0);          //Set the cursor to Xth Page, Yth Column
   SeeedOled.putString("Beer(oC): "); //Print the String
-  beertemp = OWtemp();
+  float beertemp = OWtemp();
   SeeedOled.putFloat(beertemp,1);
-  if (beertemp < 8 && sent_sms==0) {
-      sent_sms = 1;                   // only send sms once
+  if (beertemp <= -100) {
+    // Probably something's wrong with the sensor
+    return;
+  }
+  if (beertemp < 8 && !sent_sms) {
+      sent_sms = true;               // only send sms once
       SeeedOled.setTextXY(4,0);
       SeeedOled.putString("Sending SMS");
       SeeedOled.setTextXY(5,0);
-      smsSent = gprsbee.sendSMS(TELNO, "The beer is cold");
+      bool smsSent = gprsbee.sendSMS(TELNO, "The beer is cold");
       delay(2000);
       gprsbee.off();
       if (smsSent) {
@@ -64,7 +66,7 @@ void loop()             /*----( LOOP: RUNS CONSTANTLY )----*/
 float OWtemp(void)
 {
   byte i;
-  byte present = 0;
+  byte present;
   byte type_s;
   byte data[12];
   byte addr[8] = "";
@@ -79,6 +81,10 @@ float OWtemp(void)
   // we might do a ds.depower() here, but the reset will take care of it.
 
   present = ds.reset();
+  if (!present) {
+    // No device present
+    return -273;
+  }
   ds.select(addr);
   ds.write(0xBE);                       // Read Scratchpad
 
