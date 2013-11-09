@@ -15,14 +15,14 @@
 OneWire ds(ONEWIRE_PIN);
 
 int sent_sms=0 ;  // we only want to send an sms once
-float beertemp; 
+float beertemp;
 bool smsSent;
 
 //############ forward declare #################
 // This is only needed to make avr-eclipse happy
 float OWtemp(void);
 
-void setup()   /*----( SETUP: RUNS ONCE )----*/
+void setup()            /*----( SETUP: RUNS ONCE )----*/
 {
   Serial.begin(9600);      // Serial1 is connected to SIM900 GPRSbee
   gprsbee.init(Serial, XBEECTS_PIN, GPRSBEE_PWRPIN);
@@ -32,23 +32,23 @@ void setup()   /*----( SETUP: RUNS ONCE )----*/
   SeeedOled.clearDisplay();          //clear the screen and set start position to top left corner
   SeeedOled.setNormalDisplay();      //Set display to normal mode (i.e non-inverse mode)
   SeeedOled.setPageMode();           //Set addressing mode to Page Mode
-}/*--(end setup )---*/
- 
-void loop()   /*----( LOOP: RUNS CONSTANTLY )----*/
+}                       /*--(end setup )---*/
+
+void loop()             /*----( LOOP: RUNS CONSTANTLY )----*/
 {
-  SeeedOled.setTextXY(0,0);          //Set the cursor to Xth Page, Yth Column   
-  SeeedOled.putString("Beer(oC): "); //Print the String         
-  beertemp = OWtemp(); 
+  SeeedOled.setTextXY(0,0);          //Set the cursor to Xth Page, Yth Column
+  SeeedOled.putString("Beer(oC): "); //Print the String
+  beertemp = OWtemp();
   SeeedOled.putFloat(beertemp,1);
-  if (beertemp < 8 && sent_sms==0){
-      sent_sms =1;  // only send sms once
-      SeeedOled.setTextXY(4,0);         
+  if (beertemp < 8 && sent_sms==0) {
+      sent_sms = 1;                   // only send sms once
+      SeeedOled.setTextXY(4,0);
       SeeedOled.putString("Sending SMS");
       SeeedOled.setTextXY(5,0);
       smsSent = gprsbee.sendSMS(TELNO, "The beer is cold");
       delay(2000);
       gprsbee.off();
-      if (smsSent){
+      if (smsSent) {
         SeeedOled.setTextXY(6,0);
         SeeedOled.putString("SMS sent OK");
       } else {
@@ -56,8 +56,8 @@ void loop()   /*----( LOOP: RUNS CONSTANTLY )----*/
         SeeedOled.putString("SMS not sent");
       }
   }
-}/* --(end main loop )-- */
- 
+}                       /* --(end main loop )-- */
+
 
 
 
@@ -101,15 +101,17 @@ float OWtemp(void)
     byte cfg = (data[4] & 0x60);
     // at lower res, the low bits are undefined, so let's zero them
     if (cfg == 0x00)
-      raw = raw & ~7; // 9 bit resolution, 93.75 ms
+      raw = raw & ~7;                   // 9 bit resolution, 93.75 ms
     else if (cfg == 0x20)
-      raw = raw & ~3; // 10 bit res, 187.5 ms
+      raw = raw & ~3;                   // 10 bit res, 187.5 ms
     else if (cfg == 0x40)
-      raw = raw & ~1; // 11 bit res, 375 ms
-    //// default is 12 bit resolution, 750 ms conversion time
+      raw = raw & ~1;                   // 11 bit res, 375 ms
+    else {
+      //// default is 12 bit resolution, 750 ms conversion time
+    }
   }
   celsius = (float) raw / 16.0;
   return celsius;
 }
- 
+
 /* ( THE END ) */
