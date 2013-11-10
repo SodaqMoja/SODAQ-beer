@@ -85,6 +85,25 @@ float OWtemp(void)
   ds.select(addr);
   ds.write(0xBE);                       // Read Scratchpad
 
+  // the first ROM byte indicates which chip
+  switch (addr[0]) {
+    case 0x10:
+      //Serial.println("  Chip = DS18S20");  // or old DS1820
+      type_s = 1;
+      break;
+    case 0x28:
+      //Serial.println("  Chip = DS18B20");
+      type_s = 0;
+      break;
+    case 0x22:
+      //Serial.println("  Chip = DS1822");
+      type_s = 0;
+      break;
+    default:
+      //Serial.println("Device is not a DS18x20 family device.");
+      return -273;
+  }
+
   for (i = 0; i < 9; i++) {             // we need 9 bytes
     data[i] = ds.read();
   }
@@ -95,7 +114,7 @@ float OWtemp(void)
   // even when compiled on a 32 bit processor.
   int16_t raw = (data[1] << 8) | data[0];
   if (type_s) {
-    raw = raw << 3; // 9 bit resolution default
+    raw = raw << 3;                     // 9 bit resolution default
     if (data[7] == 0x10) {
       // "count remain" gives full 12 bit resolution
       raw = (raw & 0xFFF0) + 12 - data[6];
